@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@launchdarkly/observability": "^0.3.10",
-    "@launchdarkly/session-replay": "^0.3.10",
-    "launchdarkly-react-client-sdk": "^3.8.1",
+    "@launchdarkly/observability": "^1.1.0",
+    "@launchdarkly/session-replay": "^1.1.0",
+    "launchdarkly-react-client-sdk": "^3.9.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
