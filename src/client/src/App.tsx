@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
-import { withLDProvider } from 'launchdarkly-react-client-sdk'
+import { withLDProvider, useLDClient } from 'launchdarkly-react-client-sdk'
 import Observability from '@launchdarkly/observability'
 import SessionReplay from '@launchdarkly/session-replay'
+import UI2 from './UI2'
 import './App.css'
 
 function App() {
+  const ldClient = useLDClient()
+  const [showUI2, setShowUI2] = useState(false)
   const [oldApiCount, setOldApiCount] = useState(0)
   const [newApiCount, setNewApiCount] = useState(0)
   const [oldApiErrors, setOldApiErrors] = useState(0)
@@ -75,6 +78,30 @@ function App() {
     }
   }, [])
 
+  // release: UI 2.0 — serves the redesigned console. Defaults to false, so any
+  // problem resolving the flag leaves users on the original UI below.
+  useEffect(() => {
+    if (!ldClient) return
+    const readFlag = () => setShowUI2(ldClient.variation('release-ui-2-0', false) === true)
+    readFlag()
+    ldClient.on('change:release-ui-2-0', readFlag)
+    return () => ldClient.off('change:release-ui-2-0', readFlag)
+  }, [ldClient])
+
+  if (showUI2) {
+    return (
+      <UI2
+        oldApiCount={oldApiCount}
+        newApiCount={newApiCount}
+        oldApiErrors={oldApiErrors}
+        newApiErrors={newApiErrors}
+        isTrafficRunning={isTrafficRunning}
+        onToggleTraffic={handleStartTraffic}
+        onReset={handleReset}
+      />
+    )
+  }
+
   return (
     <div className="app-container">
       <div className="left-section">
@@ -116,10 +143,10 @@ function App() {
 }
 
 export default withLDProvider({
-  clientSideID: '6622f4d207a0a80fed54a557',
+  clientSideID: '6a30012ad5d5370a65cf6c71',
   context: {
     kind: "user",
-    key: 'abc-123',
+    key: 'Matt-Damon',
   },
   options: {
     plugins: [
